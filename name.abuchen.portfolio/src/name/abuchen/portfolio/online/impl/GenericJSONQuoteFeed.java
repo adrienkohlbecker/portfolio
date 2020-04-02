@@ -32,7 +32,7 @@ import name.abuchen.portfolio.online.impl.variableurl.Factory;
 import name.abuchen.portfolio.online.impl.variableurl.urls.VariableURL;
 import name.abuchen.portfolio.util.WebAccess;
 
-public final class GenericJSONQuoteFeed implements QuoteFeed
+public class GenericJSONQuoteFeed implements QuoteFeed
 {
     public static final String ID = "GENERIC-JSON"; //$NON-NLS-1$
     public static final String DATE_PROPERTY_NAME = "GENERIC-JSON-DATE"; //$NON-NLS-1$
@@ -61,20 +61,20 @@ public final class GenericJSONQuoteFeed implements QuoteFeed
     @Override
     public QuoteFeedData getHistoricalQuotes(Security security, boolean collectRawResponse)
     {
-        return getHistoricalQuotes(security, security.getFeedURL(), collectRawResponse, false);
+        return getHistoricalQuotes(security, feedURL(security), collectRawResponse, false);
     }
 
     @Override
     public QuoteFeedData previewHistoricalQuotes(Security security)
     {
-        return getHistoricalQuotes(security, security.getFeedURL(), true, true);
+        return getHistoricalQuotes(security, feedURL(security), true, true);
     }
 
     private QuoteFeedData getHistoricalQuotes(Security security, String feedURL, boolean collectRawResponse,
                     boolean isPreview)
     {
-        Optional<String> dateProperty = security.getPropertyValue(SecurityProperty.Type.FEED, DATE_PROPERTY_NAME);
-        Optional<String> closeProperty = security.getPropertyValue(SecurityProperty.Type.FEED, CLOSE_PROPERTY_NAME);
+        Optional<String> dateProperty = dateProperty(security);
+        Optional<String> closeProperty = closeProperty(security);
 
         if (!dateProperty.isPresent() || !closeProperty.isPresent())
         {
@@ -229,5 +229,20 @@ public final class GenericJSONQuoteFeed implements QuoteFeed
         }
 
         return LocalDateTime.ofEpochSecond(object, 0, ZoneOffset.UTC).toLocalDate();
+    }
+
+    protected String feedURL(Security security)
+    {
+        return security.getFeedURL();
+    }
+
+    protected Optional<String> dateProperty(Security security)
+    {
+        return security.getPropertyValue(SecurityProperty.Type.FEED, DATE_PROPERTY_NAME);
+    }
+
+    protected Optional<String> closeProperty(Security security)
+    {
+        return security.getPropertyValue(SecurityProperty.Type.FEED, CLOSE_PROPERTY_NAME);
     }
 }
